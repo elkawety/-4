@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تجربة الواقع المعزز - ميزات متقدمة</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+        }
+
+        .info button,
+        .info input {
+            margin: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .info button:hover {
+            background-color: #0056b3;
+        }
+
+        .info input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .info select {
+            margin: 5px;
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="info">
+        <label>اختر رقم الموديل:</label>
+        <input type="number" id="modelNumber" min="1" max="100" value="1">
+        <button onclick="loadModel()">تحميل الموديل</button>
+
+        <label>تدوير الستارة:</label>
+        <button onclick="rotateCurtain('left')">تدوير لليسار</button>
+        <button onclick="rotateCurtain('right')">تدوير لليمين</button>
+
+        <label>تغيير اللون:</label>
+        <select id="colorPicker" onchange="changeColor()">
+            <option value="none">بدون تعديل</option>
+            <option value="#ff0000">أحمر</option>
+            <option value="#0000ff">أزرق</option>
+            <option value="#00ff00">أخضر</option>
+            <option value="#ff00ff">بنفسجي</option>
+            <option value="#ffffff">أبيض</option>
+        </select>
+    </div>
+
+    <a-scene embedded arjs>
+        <!-- كائن افتراضي يمثل الستارة -->
+        <a-image id="curtain" position="0 1 -2" rotation="0 0 0" width="2" height="3" src="models/curtain1.jpg">
+        </a-image>
+
+        <!-- إضافة إضاءة لتحسين المظهر -->
+        <a-light type="directional" position="0 2 3" intensity="1.5"></a-light>
+
+        <!-- ماركر الواقع المعزز -->
+        <a-marker-camera preset="hiro"></a-marker-camera>
+    </a-scene>
+
+    <script>
+        // تحميل الموديل
+        function loadModel() {
+            const modelNumber = document.getElementById('modelNumber').value;
+            const curtain = document.getElementById('curtain');
+
+            // تحديث مسار الصورة
+            const imagePath = `models/curtain${modelNumber}.jpg`;
+            curtain.setAttribute('src', imagePath);
+
+            // إعادة تعيين اللون والزاوية عند تغيير الموديل
+            curtain.setAttribute('rotation', '0 0 0');
+            curtain.setAttribute('material', 'color: white');
+        }
+
+        // تدوير الستارة
+        function rotateCurtain(direction) {
+            const curtain = document.getElementById('curtain');
+            const rotation = curtain.getAttribute('rotation');
+            let y = rotation.y;
+
+            // تحديث زاوية الدوران
+            if (direction === 'left') {
+                y -= 10;
+            } else if (direction === 'right') {
+                y += 10;
+            }
+
+            curtain.setAttribute('rotation', `0 ${y} 0`);
+        }
+
+        // تغيير اللون
+        function changeColor() {
+            const color = document.getElementById('colorPicker').value;
+            const curtain = document.getElementById('curtain');
+
+            // إذا تم اختيار "بدون تعديل" يتم إعادة تعيين اللون الأصلي
+            if (color === 'none') {
+                curtain.setAttribute('material', 'color: white');
+            } else {
+                curtain.setAttribute('material', `color: ${color}`);
+            }
+        }
+    </script>
+</body>
+
+</html>
